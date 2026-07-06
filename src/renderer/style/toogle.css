@@ -1,0 +1,61 @@
+.switch {
+  --s-width: 35px;
+  --s-height: 20px;
+  --s-border-width: 1px;
+  --knob-padding: 2px;
+  --knob-width: calc(
+    var(--s-height) - var(--s-border-width) * 2 - var(--knob-padding)
+  );
+  --knob-distance: calc(var(--s-width) - var(--s-height));
+
+  position: relative;
+  display: inline-block;
+  width: var(--s-width);
+  height: var(--s-height);
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--text-color-disabled);
+  border: var(--s-border-widht) solid #202020f2;
+  transition: 0.2s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: var(--knob-width);
+  width: var(--knob-width);
+  left: var(--knob-padding);
+  bottom: var(--knob-padding);
+  background-color: var(--disabled-gray);
+  transition: 0.2s;
+}
+
+input:checked + .slider {
+  background-color: var(--bg-clip-btn-focus);
+}
+
+input:checked + .slider:before {
+  transform: translateX(var(--knob-distance));
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 9999px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+}

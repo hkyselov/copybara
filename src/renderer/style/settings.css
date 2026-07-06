@@ -1,0 +1,171 @@
+.nav {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  justify-content: center;
+  border-bottom: 1px solid var(--border-color-btn);
+  padding: 0.4rem;
+  overflow: auto;
+  -webkit-app-region: drag;
+  background-color: var(--bg-color-dark);
+}
+
+.nav button {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--bg-btn);
+  -webkit-app-region: no-drag;
+  padding: 0.1rem 0.3rem;
+  border: 1px solid var(--border-color-btn);
+  border-radius: 0.4rem;
+  color: var(--text-color-disabled);
+  font-size: 12px;
+  outline: none;
+  transform: 0.2s all;
+}
+
+.nav button.active-btn,
+.nav button:focus {
+  background-color: var(--bg-btn-active);
+  color: var(--text-color);
+}
+
+.nav button:hover {
+  background-color: var(--bg-btn-active);
+}
+
+.nav button:active {
+  transform: scale(0.95);
+}
+
+.nav button svg {
+  width: 3rem;
+  height: 2rem;
+}
+
+.setting_wrapper {
+  padding: 0.3rem;
+}
+
+#general {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.section {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.number-input {
+  /* width: 3rem; */
+  background-color: var(--bg-color-dark);
+  outline: none;
+  color: var(--text-color);
+  padding: 0.2rem;
+  border-radius: 0.3rem;
+  border: 1px solid var(--border-color-btn);
+}
+
+#shortcut {
+  background-color: var(--bg-color-dark);
+  outline: none;
+  color: var(--text-color);
+  padding: 0.2rem;
+  border-radius: 0.3rem;
+  text-align: center;
+  border: 1px solid var(--border-color-btn);
+  width: 10rem;
+}
+
+.shortcutWrapper {
+  position: relative;
+}
+
+.deleteShortcut {
+  position: absolute;
+  background-color: var(--bg-btn);
+  color: var(--text-color-disabled);
+  -webkit-app-region: no-drag;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 3px;
+  border: 1px solid var(--border-color-btn);
+  border-radius: 0.4rem;
+  font-size: 10px;
+  outline: none;
+  transform: 0.2s all;
+}
+
+.deleteShortcut:hover {
+  transform: translateY(-50%) scale(1.05);
+}
+
+.deleteShortcut:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.restore_wrapper {
+  display: flex;
+  justify-content: end;
+  align-items: center;
+  padding: 0.1rem 0.5rem;
+}
+
+.restore {
+  background-color: var(--bg-btn);
+  -webkit-app-region: no-drag;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--border-color-btn);
+  border-radius: 0.4rem;
+  color: var(--text-color-disabled);
+  font-size: 0.9rem;
+  outline: none;
+  transform: 0.2s all;
+}
+
+.restore:focus,
+.restore:hover {
+  background-color: var(--bg-btn-active);
+}
+
+.restore:active {
+  transform: scale(0.95);
+}
+
+.about {
+  display: grid;
+  place-content: center;
+  height: calc(100vh - 5rem);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.about_info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.about_info svg {
+  width: 6rem;
+  height: 6rem;
+}
+
+.about_info p {
+  color: var(--text-color-disabled);
+  font-size: 0.8rem;
+}

@@ -1,0 +1,231 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:" />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:" />
+    <link rel="stylesheet" href="../renderer/style/index.css" />
+    <link rel="stylesheet" href="../renderer/style/reset.css" />
+    <link rel="stylesheet" href="../renderer/style/scrollbar.css" />
+    <link rel="stylesheet" href="../renderer/style/loader.css" />
+    <link rel="stylesheet" href="../renderer/style/settings.css" />
+    <link rel="stylesheet" href="../renderer/style/toogle.css" />
+    <title>Preferences</title>
+  </head>
+
+  <body>
+    <div class="nav">
+      <button id="general-btn" class="active-btn">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor">
+          <path
+            d="M12 16c2.206 0 4-1.794 4-4s-1.794-4-4-4-4 1.794-4 4 1.794 4 4 4zm0-6c1.084 0 2 .916 2 2s-.916 2-2 2-2-.916-2-2 .916-2 2-2z"></path>
+          <path
+            d="m2.845 16.136 1 1.73c.531.917 1.809 1.261 2.73.73l.529-.306A8.1 8.1 0 0 0 9 19.402V20c0 1.103.897 2 2 2h2c1.103 0 2-.897 2-2v-.598a8.132 8.132 0 0 0 1.896-1.111l.529.306c.923.53 2.198.188 2.731-.731l.999-1.729a2.001 2.001 0 0 0-.731-2.732l-.505-.292a7.718 7.718 0 0 0 0-2.224l.505-.292a2.002 2.002 0 0 0 .731-2.732l-.999-1.729c-.531-.92-1.808-1.265-2.731-.732l-.529.306A8.1 8.1 0 0 0 15 4.598V4c0-1.103-.897-2-2-2h-2c-1.103 0-2 .897-2 2v.598a8.132 8.132 0 0 0-1.896 1.111l-.529-.306c-.924-.531-2.2-.187-2.731.732l-.999 1.729a2.001 2.001 0 0 0 .731 2.732l.505.292a7.683 7.683 0 0 0 0 2.223l-.505.292a2.003 2.003 0 0 0-.731 2.733zm3.326-2.758A5.703 5.703 0 0 1 6 12c0-.462.058-.926.17-1.378a.999.999 0 0 0-.47-1.108l-1.123-.65.998-1.729 1.145.662a.997.997 0 0 0 1.188-.142 6.071 6.071 0 0 1 2.384-1.399A1 1 0 0 0 11 5.3V4h2v1.3a1 1 0 0 0 .708.956 6.083 6.083 0 0 1 2.384 1.399.999.999 0 0 0 1.188.142l1.144-.661 1 1.729-1.124.649a1 1 0 0 0-.47 1.108c.112.452.17.916.17 1.378 0 .461-.058.925-.171 1.378a1 1 0 0 0 .471 1.108l1.123.649-.998 1.729-1.145-.661a.996.996 0 0 0-1.188.142 6.071 6.071 0 0 1-2.384 1.399A1 1 0 0 0 13 18.7l.002 1.3H11v-1.3a1 1 0 0 0-.708-.956 6.083 6.083 0 0 1-2.384-1.399.992.992 0 0 0-1.188-.141l-1.144.662-1-1.729 1.124-.651a1 1 0 0 0 .471-1.108z"></path>
+        </svg>
+        <span>General</span>
+      </button>
+      <button id="about-btn">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="currentColor">
+          <path
+            d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"></path>
+          <path d="M11 11h2v6h-2zm0-4h2v2h-2z"></path>
+        </svg>
+        <span> About </span>
+      </button>
+    </div>
+    <div class="setting_wrapper">
+      <div id="general">
+        <div class="no-drag section">
+          <label>Open at Login</label>
+          <label class="switch">
+            <input type="checkbox" value="openAtLogin" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="no-drag section">
+          <div>
+            <label>Auto hide window if inactive</label>
+            <select class="number-input" name="delay" id="autohide-delay">
+              <option value="0.5">0.5sec</option>
+              <option value="1" selected>1sec</option>
+              <option value="2">2sec</option>
+              <option value="3">3sec</option>
+              <option value="5">5sec</option>
+              <option value="10">10sec</option>
+              <option value="30">30sec</option>
+              <option value="60">1min</option>
+              <option value="120">2min</option>
+              <option value="180">3min</option>
+            </select>
+          </div>
+          <label class="switch">
+            <input type="checkbox" value="autoHideWindow" />
+            <span class="slider round"></span>
+          </label>
+        </div>
+
+        <div class="no-drag section">
+          <label>Open clipboard</label>
+          <div class="shortcutWrapper">
+            <input id="shortcut" type="text" placeholder="Record Shortcut" />
+            <button class="deleteShortcut">
+              <svg
+                class="iconImg"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24">
+                <path
+                  d="M3.398 1.783a1.615 1.615 0 0 0-1.142.473 1.615 1.615 0 0 0 0 2.283L9.715 12l-7.46 7.46a1.615 1.615 0 0 0 0 2.284 1.615 1.615 0 0 0 2.284 0L12 14.285l7.46 7.46a1.615 1.615 0 0 0 2.284 0 1.615 1.615 0 0 0 0-2.284L14.285 12l7.46-7.46a1.615 1.615 0 0 0 0-2.284 1.615 1.615 0 0 0-2.284 0L12 9.715l-7.46-7.46a1.615 1.615 0 0 0-1.142-.472Z" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="no-drag restore_wrapper">
+          <button class="restore">Restore to default</button>
+        </div>
+      </div>
+
+      <div id="about" style="display: none">
+        <div class="no-drag about">
+          <div class="about_info">
+            <svg
+              xml:space="preserve"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 1024 1024">
+              <defs>
+                <filter
+                  id="a"
+                  x="86"
+                  y="96"
+                  width="852"
+                  height="852"
+                  filterUnits="userSpaceOnUse"
+                  color-interpolation-filters="sRGB">
+                  <feFlood flood-opacity="0" result="BackgroundImageFix" />
+                  <feColorMatrix
+                    in="SourceAlpha"
+                    values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+                    result="hardAlpha" />
+                  <feOffset dy="10" />
+                  <feGaussianBlur stdDeviation="5" />
+                  <feColorMatrix
+                    values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.3 0" />
+                  <feBlend
+                    in2="BackgroundImageFix"
+                    result="effect1_dropShadow_3_267" />
+                  <feBlend
+                    in="SourceGraphic"
+                    in2="effect1_dropShadow_3_267"
+                    result="shape" />
+                </filter>
+                <filter
+                  style="color-interpolation-filters: sRGB"
+                  id="b"
+                  x="-.077"
+                  y="-.078"
+                  width="1.154"
+                  height="1.156">
+                  <feGaussianBlur stdDeviation="22.043" />
+                </filter>
+              </defs>
+              <path
+                style="
+                  display: inline;
+                  opacity: 1;
+                  fill: #fff;
+                  stroke-width: 3.67023;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                "
+                d="M1878.668 157.775c-103.889 0-187.524 83.637-187.524 187.526v456.95c0 103.89 83.635 187.524 187.524 187.524h456.951c103.889 0 187.525-83.634 187.525-187.523V345.301c0-103.89-83.636-187.526-187.525-187.526z"
+                transform="translate(61.465 16.737) scale(.97083)" />
+              <path
+                style="
+                  display: inline;
+                  opacity: 1;
+                  fill: #333;
+                  fill-opacity: 1;
+                  stroke-width: 3.67023;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                "
+                d="M1878.668 157.775c-103.889 0-187.524 83.637-187.524 187.526v456.95c0 103.89 83.635 187.524 187.524 187.524h456.951c103.889 0 187.525-83.634 187.525-187.523V345.301c0-103.89-83.636-187.526-187.525-187.526z"
+                transform="matrix(.91894 0 0 .91894 170.805 46.51)" />
+              <path
+                style="
+                  display: inline;
+                  fill: #999;
+                  stroke-width: 3.67023;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                "
+                d="M283.525 96h456.95C844.364 96 928 179.636 928 283.525v456.95C928 844.364 844.364 928 740.475 928h-456.95C179.636 928 96 844.364 96 740.475v-456.95C96 179.636 179.636 96 283.525 96Z" />
+              <path
+                style="
+                  display: inline;
+                  fill: #fff;
+                  stroke-width: 3.56317;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                "
+                d="M290.19 108.135c-100.858 0-182.055 81.196-182.055 182.055v443.62c0 100.859 81.197 182.055 182.055 182.055h443.62c100.859 0 182.055-81.196 182.055-182.055V290.19c0-100.859-81.196-182.055-182.055-182.055z" />
+              <path
+                style="
+                  display: inline;
+                  fill: #333;
+                  stroke-width: 3.37272;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                "
+                d="M302.046 129.721c-95.468 0-172.325 76.857-172.325 172.325v419.908c0 95.468 76.857 172.325 172.325 172.325h419.908c95.468 0 172.325-76.857 172.325-172.325V302.046c0-95.468-76.857-172.325-172.325-172.325z" />
+              <path
+                style="
+                  display: inline;
+                  mix-blend-mode: normal;
+                  fill: #000;
+                  stroke-width: 77.6987;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                  filter: url(#b);
+                "
+                d="M320.865 173.756a54.486 54.486 0 0 0-54.478 54.478 54.486 54.486 0 0 0 30.513 48.854c-.7.771-1.405 1.528-2.099 2.308a99.676 99.676 0 0 0-24.553-3.148 99.676 99.676 0 0 0-70.72 29.422 141.052 141.052 0 0 1 13.094-.585 141.052 141.052 0 0 1 53.345 10.828c-39.771 56.67-68.828 126.184-89.734 199.026-51.088 178.006 150.113 335.306 335.306 335.306 185.192 0 389.817-158.305 335.347-335.306-22.26-72.332-50.794-140.498-88.894-196.256a141.052 141.052 0 0 1 59.934-13.598 141.052 141.052 0 0 1 13.095.585 99.676 99.676 0 0 0-70.72-29.422 99.676 99.676 0 0 0-30.975 5.12 366.047 366.047 0 0 0-5.33-6.001 54.486 54.486 0 0 0 27.406-47.133 54.486 54.486 0 0 0-54.52-54.479 54.486 54.486 0 0 0-52.002 38.404C606.567 191.41 562.5 179.63 511.54 179.63c-52.617 0-98.278 12.776-137.874 35.088a54.486 54.486 0 0 0-52.8-40.963zm-23 160.412a141.052 141.052 0 0 1 52.673 84.488 50.36 50.36 0 0 1-31.268 10.954 50.36 50.36 0 0 1-50.365-50.365 50.36 50.36 0 0 1 28.96-45.077zm434.65.123a50.36 50.36 0 0 1 28.793 44.955 50.36 50.36 0 0 1-50.366 50.365 50.36 50.36 0 0 1-30.848-11.542 141.052 141.052 0 0 1 52.421-83.774zM512 371.35c68.408 0 146.183 39.776 140.477 86.46l-16.998 265.34c-5.706 46.682-55.07 84.906-123.479 84.906-68.408 0-117.894-38.209-123.478-84.907L371.524 454.71C365.94 408.01 443.592 371.354 512 371.354zm148.745 6.967a99.676 99.676 0 0 0 .168 2.686 50.36 50.36 0 0 1-.336-1.763 50.36 50.36 0 0 1 .168-.923zm-227.86 44.195c-19.606 0-35.465 15.9-35.465 35.507s15.859 35.508 35.465 35.508c19.607 0 35.508-15.901 35.508-35.508 0-19.606-15.901-35.507-35.508-35.507zm157.433 0c-19.606 0-35.465 15.9-35.465 35.507s15.859 35.508 35.465 35.508c19.607 0 35.507-15.901 35.507-35.508 0-19.606-15.9-35.507-35.507-35.507zm-78.486 53.219a297.403 354.04 0 0 0-24.72 140.183 297.403 354.04 0 0 0 24.553 139.637 297.403 354.04 0 0 0 24.553-139.637 297.403 354.04 0 0 0-24.386-140.183z" />
+              <path
+                style="
+                  opacity: 0.247458;
+                  fill: #b3b3b3;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                "
+                d="M283.525 96C179.637 96 96 179.637 96 283.525V434.7a578.047 578.047 0 0 0 416 178.649 578.047 578.047 0 0 0 416-178.65V283.524C928 179.637 844.363 96 740.475 96Z" />
+              <path
+                style="
+                  fill: #ececec;
+                  stroke-width: 71.2138;
+                  stroke-linecap: round;
+                  stroke-linejoin: round;
+                "
+                d="M336.818 201.986a49.939 49.939 0 0 0-49.932 49.931 49.939 49.939 0 0 0 27.966 44.777c-.64.707-1.287 1.401-1.923 2.116a91.357 91.357 0 0 0-22.504-2.886 91.357 91.357 0 0 0-64.818 26.966 129.28 129.28 0 0 1 12.002-.536 129.28 129.28 0 0 1 48.893 9.925c-36.452 51.94-63.084 115.652-82.245 182.415-46.824 163.15 137.585 307.32 307.32 307.32 169.736 0 357.283-145.092 307.359-307.32-20.402-66.295-46.555-128.772-81.475-179.876a129.28 129.28 0 0 1 54.932-12.464 129.28 129.28 0 0 1 12.002.536 91.357 91.357 0 0 0-64.818-26.966 91.357 91.357 0 0 0-28.39 4.694 335.718 335.718 0 0 0-4.885-5.501 49.939 49.939 0 0 0 25.12-43.2 49.939 49.939 0 0 0-49.97-49.931 49.939 49.939 0 0 0-47.662 35.198c-35.116-19.016-75.506-29.813-122.213-29.813-48.225 0-90.075 11.71-126.367 32.16a49.939 49.939 0 0 0-48.392-37.545zm-21.08 147.024a129.28 129.28 0 0 1 48.276 77.436 46.156 46.156 0 0 1-28.658 10.04 46.156 46.156 0 0 1-46.162-46.161 46.156 46.156 0 0 1 26.543-41.315zm398.373.113a46.156 46.156 0 0 1 26.389 41.203 46.156 46.156 0 0 1-46.162 46.161 46.156 46.156 0 0 1-28.274-10.579 129.28 129.28 0 0 1 48.047-76.782zM512 383.089c62.698 0 133.981 36.457 128.752 79.244l-15.58 243.194c-5.23 42.787-50.474 77.82-113.173 77.82-62.698 0-108.055-35.02-113.172-77.82l-15.58-246.037c-5.117-42.8 66.054-76.397 128.752-76.397zm136.33 6.386a91.357 91.357 0 0 0 .153 2.462 46.156 46.156 0 0 1-.307-1.616 46.156 46.156 0 0 1 .153-.846zm-208.843 40.507c-17.97 0-32.505 14.573-32.505 32.544 0 17.97 14.535 32.543 32.505 32.543 17.97 0 32.544-14.573 32.544-32.543s-14.573-32.544-32.544-32.544zm144.294 0c-17.97 0-32.506 14.573-32.506 32.544 0 17.97 14.536 32.543 32.506 32.543s32.543-14.573 32.543-32.543-14.573-32.544-32.543-32.544zm-71.935 48.777a272.581 324.49 0 0 0-22.658 128.483 272.581 324.49 0 0 0 22.504 127.983 272.581 324.49 0 0 0 22.503-127.983 272.581 324.49 0 0 0-22.35-128.483z" />
+            </svg>
+            <div>
+              <h1>Copybara</h1>
+              <p>Clipboard Manager</p>
+              <p>Version 1.0.1</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="../renderer/settings.js"></script>
+  </body>
+</html>

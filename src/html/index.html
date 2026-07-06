@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:" />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:" />
+
+    <link rel="stylesheet" href="../renderer/style/index.css" />
+    <link rel="stylesheet" href="../renderer/style/reset.css" />
+    <link rel="stylesheet" href="../renderer/style/scrollbar.css" />
+
+    <title>Copybara clipboard</title>
+  </head>
+
+  <body>
+    <div class="wrapper">
+      <div class="header">
+        <div class="checkboxWrapper">
+          <input
+            id="windowPin"
+            type="checkbox"
+            title="Pin window"
+            tabindex="-1" />
+          <div class="p-on">
+            <svg
+              class="iconImg"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24">
+              <path
+                d="M9.437 0A2.365 2.365 0 0 0 7.07 2.366v2.37h1.32l-.497 5.447H6.846A1.865 1.865 0 0 0 4.98 12.05v3.908h5.55v6.57A1.47 1.47 0 0 0 12 24a1.47 1.47 0 0 0 1.47-1.474v-6.569h5.55V12.05a1.865 1.865 0 0 0-1.866-1.866h-.85l-.498-5.447h1.121v-2.37A2.365 2.365 0 0 0 14.563 0Z" />
+            </svg>
+          </div>
+          <div class="p-off">
+            <svg
+              class="iconImg"
+              fill="currentColor"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24">
+              <path
+                d="M9.433 0A2.365 2.365 0 0 0 7.1 2.104l11.914 11.914v-1.97a1.865 1.865 0 0 0-1.866-1.864h-.851l-.496-5.448h1.12v-2.37A2.365 2.365 0 0 0 14.559 0Zm-7.38.111A1.95 1.95 0 0 0 .682.686a1.95 1.95 0 0 0 0 2.753l6.742 6.745H6.84a1.865 1.865 0 0 0-1.865 1.865v3.908h5.55v6.568A1.47 1.47 0 0 0 11.996 24a1.47 1.47 0 0 0 1.468-1.475V16.23l7.09 7.091a1.95 1.95 0 0 0 2.761 0 1.95 1.95 0 0 0 0-2.761l-4.603-4.602-10.399-10.4v.005l-.826-.826h.006l-.428-.427v.005L3.435.686A1.95 1.95 0 0 0 2.054.11Z" />
+            </svg>
+          </div>
+        </div>
+      </div>
+      <ul id="list">
+        <div class="nocontent">
+          <p>No Content</p>
+          <p>Try to copy (⌘C) something</p>
+        </div>
+      </ul>
+      <div class="footer">
+        <h2>Copybara Clipboard</h2>
+        <button
+          class="clearBtn"
+          title="Clear all except pinned items."
+          tabindex="-1">
+          Clear All
+        </button>
+      </div>
+    </div>
+
+    <template id="clip-item-template">
+      <style>
+        :host {
+          display: block;
+          color: var(--text-color);
+          opacity: 0;
+          max-height: 0;
+          scale: 0;
+          transition: all 0.2s ease-in-out;
+          outline: none;
+          /* transform-origin: top; */
+        }
+
+        :host(.show) {
+          max-height: 100%;
+          opacity: 1;
+          scale: 1;
+        }
+        :host(:focus) .clipBtn {
+          background: var(--bg-clip-btn-focus);
+        }
+
+        img,
+        picture,
+        video,
+        canvas,
+        svg {
+          display: block;
+          max-width: 100%;
+        }
+
+        :host * {
+          box-sizing: border-box;
+        }
+
+        li {
+          position: relative;
+        }
+
+        span {
+          width: 100%;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        img {
+          /* height: rem; */
+          object-fit: contain;
+          min-height: 1.5rem;
+          max-height: 5rem;
+          border-radius: 0.3rem;
+        }
+
+        /* CSS */
+        .clipBtn {
+          position: relative;
+          display: flex;
+          text-align: left;
+          width: 100%;
+          height: 100%;
+          white-space: nowrap;
+          overflow: visible;
+          text-overflow: ellipsis;
+          flex-direction: column;
+          align-items: start;
+          padding: 0.8rem 1.2rem;
+          border-radius: 0.3rem;
+          border: none;
+          text-decoration: none;
+          cursor: default;
+          background: var(--bg-clip-btn);
+          user-select: none;
+          -webkit-user-select: none;
+          touch-action: manipulation;
+          -webkit-app-region: no-drag;
+          outline: 0;
+          color: var(--text-color);
+        }
+
+        .clipBtn:hover {
+          background: var(--bg-clip-btn-hover);
+        }
+
+        .clipBtn:focus {
+          background: var(--bg-clip-btn-focus);
+        }
+        .btnRed {
+          background-color: var(--close-red);
+        }
+
+        .btnYellow {
+          background-color: var(--pin-yellow);
+        }
+
+        .btnInfo {
+          background-color: var(--info-green);
+        }
+
+        .groupBtn {
+          position: absolute;
+          top: -0.35rem;
+          left: 0.3rem;
+          flex-direction: row-reverse;
+          justify-content: center;
+          align-items: center;
+          gap: 0.2rem;
+          display: none;
+          opacity: 0;
+        }
+
+        .groupBtn:hover > .actionBtn,
+        .groupBtn:hover > .checkboxWrapper {
+          color: #4f4f4fcc;
+        }
+
+        .actionBtn,
+        .checkboxWrapper {
+          position: relative;
+          padding: 0.1rem;
+          border-radius: 50%;
+          border: 1px solid var(--border-color);
+          outline: 0;
+          color: #4f4f4f00;
+        }
+
+        .actionBtn:hover,
+        .checkboxWrapper:hover {
+          scale: 1.05;
+        }
+
+        .iconImg {
+          width: 0.45rem;
+          height: 0.45rem;
+        }
+
+        .pinIcon {
+          position: absolute;
+          color: var(--text-color-disabled);
+          bottom: 0.1rem;
+          right: 0.1rem;
+          width: 0.6rem;
+          height: 0.6rem;
+          display: none;
+          opacity: 0;
+        }
+
+        .pinIcon.show {
+          display: inherit;
+          opacity: 1;
+        }
+
+        input[type="checkbox"] {
+          position: absolute;
+          left: 0;
+          top: 0;
+          min-width: 1em;
+          width: 100%;
+          height: 100%;
+          z-index: 2;
+          opacity: 0;
+          margin: 0;
+          padding: 0;
+        }
+
+        .p-on {
+          opacity: 0;
+          display: none;
+        }
+
+        .p-off {
+          opacity: 1;
+          display: inherit;
+        }
+
+        input:checked ~ .p-on {
+          opacity: 1;
+          display: inherit;
+        }
+
+        input:checked ~ .p-off {
+          opacity: 0;
+          display: none;
+        }
+
+        .clipBtn:hover > .groupBtn,
+        :host(:focus) .clipBtn > .groupBtn {
+          display: flex;
+          opacity: 1;
+        }
+      </style>
+      <li tabindex="-1">
+        <a href="#" class="clipBtn" alt="Clipboard content" tabindex="-1">
+          <!-- Action button section -->
+          <div class="groupBtn" tabindex="-1">
+            <!-- Info button -->
+            <button
+              class="actionBtn btnInfo"
+              title='Details (Press "i" key)'
+              tabindex="-1">
+              <svg
+                class="iconImg"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M13.379 0v4.015H8.864V0Zm.518 7.198v13.009h4.552q1.369 0 1.943.536.592.518.592 1.37 0 .832-.592 1.369-.574.518-1.943.518H5.55q-1.369 0-1.961-.518-.574-.537-.574-1.388 0-.833.574-1.35.592-.537 1.961-.537h4.552v-9.215H7.05q-1.35 0-1.943-.519-.592-.536-.592-1.387 0-.833.574-1.351.592-.537 1.961-.537z" />
+              </svg>
+            </button>
+
+            <!-- Pin/Unpin checkbox -->
+            <div class="checkboxWrapper btnYellow">
+              <input
+                type="checkbox"
+                title='Pin (Press "p" key)'
+                tabindex="-1" />
+              <div class="p-on">
+                <svg
+                  class="iconImg"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24">
+                  <path
+                    d="M9.437 0A2.365 2.365 0 0 0 7.07 2.366v2.37h1.32l-.497 5.447H6.846A1.865 1.865 0 0 0 4.98 12.05v3.908h5.55v6.57A1.47 1.47 0 0 0 12 24a1.47 1.47 0 0 0 1.47-1.474v-6.569h5.55V12.05a1.865 1.865 0 0 0-1.866-1.866h-.85l-.498-5.447h1.121v-2.37A2.365 2.365 0 0 0 14.563 0Z" />
+                </svg>
+              </div>
+              <div class="p-off">
+                <svg
+                  class="iconImg"
+                  fill="currentColor"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24">
+                  <path
+                    d="M9.433 0A2.365 2.365 0 0 0 7.1 2.104l11.914 11.914v-1.97a1.865 1.865 0 0 0-1.866-1.864h-.851l-.496-5.448h1.12v-2.37A2.365 2.365 0 0 0 14.559 0Zm-7.38.111A1.95 1.95 0 0 0 .682.686a1.95 1.95 0 0 0 0 2.753l6.742 6.745H6.84a1.865 1.865 0 0 0-1.865 1.865v3.908h5.55v6.568A1.47 1.47 0 0 0 11.996 24a1.47 1.47 0 0 0 1.468-1.475V16.23l7.09 7.091a1.95 1.95 0 0 0 2.761 0 1.95 1.95 0 0 0 0-2.761l-4.603-4.602-10.399-10.4v.005l-.826-.826h.006l-.428-.427v.005L3.435.686A1.95 1.95 0 0 0 2.054.11Z" />
+                </svg>
+              </div>
+            </div>
+
+            <!-- Remove button -->
+            <button
+              class="actionBtn btnRed"
+              title='Delete (Press "delete" key)'
+              tabindex="-1">
+              <svg
+                class="iconImg"
+                fill="currentColor"
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24">
+                <path
+                  d="M3.398 1.783a1.615 1.615 0 0 0-1.142.473 1.615 1.615 0 0 0 0 2.283L9.715 12l-7.46 7.46a1.615 1.615 0 0 0 0 2.284 1.615 1.615 0 0 0 2.284 0L12 14.285l7.46 7.46a1.615 1.615 0 0 0 2.284 0 1.615 1.615 0 0 0 0-2.284L14.285 12l7.46-7.46a1.615 1.615 0 0 0 0-2.284 1.615 1.615 0 0 0-2.284 0L12 9.715l-7.46-7.46a1.615 1.615 0 0 0-1.142-.472Z" />
+              </svg>
+            </button>
+          </div>
+          <svg
+            class="pinIcon"
+            fill="currentColor"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24">
+            <path
+              d="M9.437 0A2.365 2.365 0 0 0 7.07 2.366v2.37h1.32l-.497 5.447H6.846A1.865 1.865 0 0 0 4.98 12.05v3.908h5.55v6.57A1.47 1.47 0 0 0 12 24a1.47 1.47 0 0 0 1.47-1.474v-6.569h5.55V12.05a1.865 1.865 0 0 0-1.866-1.866h-.85l-.498-5.447h1.121v-2.37A2.365 2.365 0 0 0 14.563 0Z" />
+          </svg>
+        </a>
+      </li>
+    </template>
+
+    <script type="module" src="../renderer/renderer.js"></script>
+  </body>
+</html>

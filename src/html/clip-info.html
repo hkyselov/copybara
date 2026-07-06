@@ -1,0 +1,32 @@
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:" />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:" />
+    <link rel="stylesheet" href="../renderer/style/index.css" />
+    <link rel="stylesheet" href="../renderer/style/reset.css" />
+    <link rel="stylesheet" href="../renderer/style/scrollbar.css" />
+    <link rel="stylesheet" href="../renderer/style/loader.css" />
+
+    <title>Info</title>
+  </head>
+
+  <body>
+    <div class="loaderWrapper">
+      <div class="loader">Loading...</div>
+    </div>
+    <div class="infoWrapper">
+      <div class="imgWrapper">
+        <img id="imgValue" class="imgValue" />
+      </div>
+      <textarea id="textValue" name="textValue" class="textValue" readonly>
+      </textarea>
+      <p class="infoTime"><span id="clipTime">Clip Time</span></p>
+    </div>
+    <script type="module" src="../renderer/clip-info.js"></script>
+  </body>
+</html>
