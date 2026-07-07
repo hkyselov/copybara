@@ -40,24 +40,25 @@ xattr -cr node_modules/electron/dist/Electron.app
 
 ## Architecture
 
-This is a multi-process/multi-window Electron app built around one always-running hidden
-"background" renderer that owns the actual clipboard-watching state machine, plus a set of
-lightweight UI windows that talk to it only through the main process. There is no bundler config
+This is a multi-window Electron app where the main process owns the clipboard-watching state
+machine, plus a set of lightweight UI windows that talk to it over IPC. There is no bundler config
 of note beyond electron-forge defaults; renderer JS is loaded straight from `src/html/*.html`.
 
-- **`src/main.js`** — the main process. Owns all app-level state: `clipboardHistory` (single
-  source of truth, kept in sync from the background process on unload), `windowPinned`,
-  auto-hide timing, tray, global shortcut, and Store-backed settings (`electron-store`). Every
+- **`src/main.js`** — the main process. Owns all app-level state: `windowPinned`, auto-hide
+  timing, tray, global shortcut, and Store-backed settings (`electron-store`). Every
   cross-window interaction is proxied through `ipcMain` handlers here — windows never talk to
-  each other directly.
-- **`src/utils/createBackgrounProcess.js`** — creates a hidden, always-alive `BrowserWindow`
-  loading `src/html/background.html` → `src/renderer/background.js`. This is the actual clipboard
-  poller: `nodeIntegration: true`, `contextIsolation: false` (deliberately, unlike every other
-  window), so it can use Node's `crypto` and Electron's `clipboard` API directly. It self-schedules
-  via `setTimeout(clipboardListener, 300)` — a 300ms poll loop, not an event — and diffs the
+  each other directly. Wires the clipboard manager's callbacks (`initClipboardManager`) to the
+  main window / clip-info window on startup.
+- **`src/utils/clipboardManager.js`** — main-process module that owns `clipboardHistory` (single
+  source of truth) and the actual clipboard poller, using Electron's main-process `clipboard`
+  API (the `clipboard` module is deprecated in renderers). It self-schedules via
+  `setTimeout(clipboardListener, 300)` — a 300ms poll loop, not an event — and diffs the
   current OS clipboard against the last entry to decide whether to push a new history item
   (handles `html`, `text`, and `image` clip types differently, including resizing images to a
-  256px thumbnail and truncating text values to 256 chars for display).
+  256px thumbnail and truncating text values to 256 chars for display). Exposes
+  `removeClip`/`pinClip`/`selectClip`/`getClipInfo`/`getClipboardHistory` for `main.js`'s ipc
+  handlers; history entries keep the full `raw` payload internally but are stripped of `raw`
+  before being emitted to any window.
 - **Main window** (`createWindow` in `main.js` + `src/html/index.html` + `src/renderer/renderer.js`
   + `src/renderer/clip-item.js`) — the popup clipboard list. Frameless, transparent, always-on-top,
   starts at `opacity: 0`/hidden and is faded in/out via `showWindow`/`hideWindow` in
@@ -68,10 +69,9 @@ of note beyond electron-forge defaults; renderer JS is loaded straight from `src
   `src/renderer/settings.js`) and **clip-info window** (`src/utils/createClipInfoWindow.js` +
   `src/html/clip-info.html` + `src/renderer/clip-info.js`) — singleton on-demand windows (module-
   level `settingWindow`/`clipInfoWindow` variable, closed and recreated rather than reused).
-- **`src/preload.js`** — the only IPC surface exposed to context-isolated renderers, via
-  `contextBridge.exposeInMainWorld("electronAPI", ...)`. Used by the main, settings, and clip-info
-  windows. The background window bypasses this entirely since it has direct `ipcRenderer`/Node
-  access.
+- **`src/preload.js`** — the only IPC surface exposed to renderers (all of which are
+  context-isolated), via `contextBridge.exposeInMainWorld("electronAPI", ...)`. Used by the main,
+  settings, and clip-info windows.
 - **`src/utils/tray.js`** — menu-bar icon + context menu (Open Clipboard / Preferences / Quit).
 - **`src/utils/defaultSettings.js`** — shape and defaults for the `electron-store` settings blob
   (`openAtLogin`, `autoHideWindow`, `autoHideDelayTime`, `openClipboardShortcut`). Settings changes
@@ -80,14 +80,14 @@ of note beyond electron-forge defaults; renderer JS is loaded straight from `src
 - **`src/renderer/keys.js`** — `KeyboardEvent.code` → display glyph/accelerator-name lookup table,
   used by the settings UI for recording a custom global shortcut.
 
-### IPC channel map (main ⇄ background ⇄ main window)
+### IPC channel map (main ⇄ main window)
 
-Clips flow one way at a time and never directly between renderers:
-`background.js` (detects clip) → `new-clip`/`clipboard-history` → `main.js` (updates
-`clipboardHistory`) → `update-clipboard` → main window. Actions on a clip (remove/pin/select) go
-the other way: main window → `remove-clip`/`pin-clip`/`select-clip` → `main.js` → forwarded to
-`bgProcess` as `remove-clip`/`pin-clip`/`select-clip` for it to mutate its own history and, on
-select, actually write the clip back to the OS clipboard.
+Clips flow one way at a time: `clipboardManager.js` (detects clip) → `onNewClip`/`onHistoryChange`
+callbacks in `main.js` → `update-clipboard` → main window (a single-clip payload appends one item;
+an array payload replaces the whole list). Actions on a clip go the other way: main window →
+`remove-clip`/`pin-clip`/`select-clip`/`clip-info` ipc → `main.js` → direct calls into
+`clipboardManager`, which mutates the history and, on select, actually writes the clip back to the
+OS clipboard.
 
 ### Packaging / signing (forge.config.js)
 
