@@ -9,7 +9,15 @@ import path from "path";
 import Store from "electron-store";
 import { defaultSettings } from "./utils/defaultSettings.js";
 import { hideWindow, showWindow } from "./utils/utils.js";
-import { createBackgrounProcess } from "./utils/createBackgrounProcess.js";
+import {
+  initClipboardManager,
+  startClipboardListener,
+  removeClip,
+  pinClip,
+  selectClip,
+  getClipInfo,
+  getClipboardHistory,
+} from "./utils/clipboardManager.js";
 import {
   createClipInfoWindow,
   setInfoWindowBackgroundColor,
@@ -27,8 +35,6 @@ import { fileURLToPath } from "url";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 let mainWindow;
-let bgProcess;
-let clipboardHistory = [];
 let windowPinned = false;
 let hideWindowTimeout;
 let settings;
@@ -73,8 +79,7 @@ const createWindow = () => {
   mainWindow.loadFile(path.join(__dirname, `./html/index.html`));
 
   mainWindow.webContents.on("did-finish-load", () => {
-    console.log("restat Main");
-    mainWindow.webContents.send("update-clipboard", clipboardHistory);
+    mainWindow.webContents.send("update-clipboard", getClipboardHistory());
     mainWindow.webContents.send("update-window-pin", windowPinned);
   });
 
@@ -134,27 +139,16 @@ if (!gotTheLock) {
     registerShortcut();
 
     ipcMain.on("remove-clip", (event, uuid) => {
-      bgProcess.webContents.send("remove-clip", uuid);
+      removeClip(uuid);
     });
 
     ipcMain.on("pin-clip", (event, uuid, pin) => {
-      bgProcess.webContents.send("pin-clip", uuid, pin);
+      pinClip(uuid, pin);
     });
 
     ipcMain.on("select-clip", (event, uuid) => {
-      bgProcess?.webContents.send("select-clip", uuid);
+      selectClip(uuid);
       if (!windowPinned) hideWindow(mainWindow);
-    });
-
-    ipcMain.on("new-clip", (event, clip) => {
-      const { raw, ...rest } = clip;
-      mainWindow?.webContents.send("update-clipboard", rest);
-    });
-
-    ipcMain.on("clipboard-history", (event, history) => {
-      console.log("unload: ", history);
-      clipboardHistory = history;
-      mainWindow?.webContents.send("update-clipboard", history);
     });
 
     ipcMain.on("pin-window", (event, pin) => {
@@ -162,11 +156,7 @@ if (!gotTheLock) {
     });
 
     ipcMain.on("clip-info", (event, uuid) => {
-      bgProcess?.webContents.send("get-clip-info", uuid);
-    });
-
-    ipcMain.on("show-clip-info", (event, clip) => {
-      createClipInfoWindow(clip, backgroundColor);
+      getClipInfo(uuid);
     });
 
     ipcMain.on("prevent-auto-hide", (event, uuid) => {
@@ -216,8 +206,19 @@ if (!gotTheLock) {
       setSettingsWindowBackgroundColor(backgroundColor());
     });
 
-    bgProcess = createBackgrounProcess(() => (bgProcess = null));
+    initClipboardManager({
+      onNewClip: (clip) => {
+        mainWindow?.webContents.send("update-clipboard", clip);
+      },
+      onHistoryChange: (history) => {
+        mainWindow?.webContents.send("update-clipboard", history);
+      },
+      onShowClipInfo: (clip) => {
+        createClipInfoWindow(clip, backgroundColor);
+      },
+    });
     createWindow();
+    startClipboardListener();
   });
 }
 
@@ -242,7 +243,6 @@ app.on("activate", () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
-    bgProcess = createBackgrounProcess(() => (bgProcess = null));
     createWindow();
   }
 });
@@ -286,15 +286,11 @@ function autoHideWindow(uuid) {
     if (!windowPinned) {
       if (autoHideWindowSetting) {
         hideWindow(mainWindow);
-        if (uuid) bgProcess?.webContents.send("select-clip", uuid, true);
+        if (uuid) selectClip(uuid, true);
       }
     }
     autoHideWindow();
   }, 1000 * settings.get("autoHideDelayTime"));
-}
-
-export function getClipboardHistory() {
-  return clipboardHistory;
 }
 
 export function getSettings() {
