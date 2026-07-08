@@ -38,6 +38,11 @@ echo -n "Electron.app/Contents/MacOS/Electron" > node_modules/electron/path.txt
 xattr -cr node_modules/electron/dist/Electron.app
 ```
 
+The same `extract-zip` bug used to kill `npm run mac`/`npm run make` silently (exit 0, no `out/`)
+while unpacking the Electron zips during packaging; the `overrides` entry in package.json pins
+`extract-zip` to `@electron-internal/extract-zip` (Electron's native fork) to fix that — don't
+remove it.
+
 ## Architecture
 
 This is a multi-window Electron app where the main process owns the clipboard-watching state
