@@ -4,11 +4,17 @@ import {
   globalShortcut,
   ipcMain,
   nativeTheme,
+  screen,
 } from "electron";
 import path from "path";
 import Store from "electron-store";
 import { defaultSettings } from "./utils/defaultSettings.js";
 import { hideWindow, showWindow } from "./utils/utils.js";
+import {
+  getCaretPoint,
+  isAccessibilityTrusted,
+  pasteInFrontmostApp,
+} from "./utils/macAutomation.js";
 import {
   initClipboardManager,
   startClipboardListener,
@@ -39,6 +45,7 @@ let windowPinned = false;
 let hideWindowTimeout;
 let settings;
 let autoHideWindowSetting;
+let accessibilityPromptShown = false;
 
 const backgroundColor = () =>
   nativeTheme.shouldUseDarkColors
@@ -148,7 +155,26 @@ if (!gotTheLock) {
 
     ipcMain.on("select-clip", (event, uuid) => {
       selectClip(uuid);
-      if (!windowPinned) hideWindow(mainWindow);
+      if (windowPinned) return;
+      hideWindow(mainWindow);
+      if (settings.get("pasteOnSelect")) {
+        if (!isAccessibilityTrusted(false)) {
+          promptAccessibilityOncePerRun();
+          app.hide();
+          return;
+        }
+        app.hide();
+        setTimeout(() => {
+          pasteInFrontmostApp();
+        }, 120);
+      }
+    });
+
+    ipcMain.on("hide-window", () => {
+      if (!windowPinned) {
+        hideWindow(mainWindow);
+        app.hide();
+      }
     });
 
     ipcMain.on("pin-window", (event, pin) => {
@@ -175,6 +201,11 @@ if (!gotTheLock) {
       if (key === "autoHideDelayTime") {
         settings.set("autoHideDelayTime", value);
         autoHideWindow();
+      }
+
+      if (key === "pasteOnSelect") {
+        settings.set("pasteOnSelect", value);
+        if (value) isAccessibilityTrusted(true);
       }
 
       if (key === "openClipboardShortcut") {
@@ -267,13 +298,39 @@ function registerShortcut() {
   }
 }
 
-function openClipboard() {
+async function openClipboard() {
   if (mainWindow?.isFocused() && mainWindow?.isVisible()) {
     mainWindow?.webContents.send("next-clip");
   } else {
+    await positionWindowNearCaret();
     showWindow(mainWindow);
     autoHideWindow();
   }
+}
+
+async function positionWindowNearCaret() {
+  if (!mainWindow || windowPinned) return; // don't yank a pinned window around
+  const caret = await getCaretPoint(350);
+  const point = caret ?? screen.getCursorScreenPoint();
+  const { workArea } = screen.getDisplayNearestPoint(point);
+  const [w, h] = mainWindow.getSize();
+  const margin = 8;
+  let x = point.x + margin;
+  let y = point.y + margin;
+  // Flip above the caret if there's no room below, so the popup never
+  // covers the insertion line.
+  if (y + h > workArea.y + workArea.height) y = point.y - h - margin - 24;
+  x = Math.round(Math.min(Math.max(x, workArea.x), workArea.x + workArea.width - w));
+  y = Math.round(Math.min(Math.max(y, workArea.y), workArea.y + workArea.height - h));
+  mainWindow.setPosition(x, y);
+}
+
+// The Accessibility prompt is shown at most once per run; pasteOnSelect
+// defaults to on, so first-time users would otherwise never see it.
+function promptAccessibilityOncePerRun() {
+  if (accessibilityPromptShown) return;
+  accessibilityPromptShown = true;
+  isAccessibilityTrusted(true);
 }
 
 function autoHideWindow(uuid) {
@@ -286,6 +343,9 @@ function autoHideWindow(uuid) {
     if (!windowPinned) {
       if (autoHideWindowSetting) {
         hideWindow(mainWindow);
+        // No pasteInFrontmostApp here: this timer can fire long after the
+        // user switched to another app, so a synthetic Cmd+V could land in
+        // the wrong place. Only an explicit Enter/click pastes.
         if (uuid) selectClip(uuid, true);
       }
     }

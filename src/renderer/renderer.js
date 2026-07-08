@@ -88,6 +88,9 @@ function setupListeners() {
     if (e.key == "ArrowUp") {
       prev();
     }
+    if (e.key == "Escape") {
+      window.electronAPI.hideWindow();
+    }
   });
 
   document.addEventListener("mouseenter", (e) => {

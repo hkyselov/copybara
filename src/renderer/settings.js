@@ -28,6 +28,17 @@ window.electronAPI.onLoadSettings((settings) => {
     );
   };
 
+  const pasteOnSelectCheckbox = document.querySelector(
+    'input[value="pasteOnSelect"]'
+  );
+  pasteOnSelectCheckbox.checked = settings.pasteOnSelect;
+  pasteOnSelectCheckbox.onchange = (event) => {
+    window.electronAPI.saveSettings(
+      pasteOnSelectCheckbox.value,
+      pasteOnSelectCheckbox.checked
+    );
+  };
+
   const autoHideDelaySelect = document.getElementById("autohide-delay");
   autoHideDelaySelect.value = settings.autoHideDelayTime;
   autoHideDelaySelect.onchange = (event) => {
