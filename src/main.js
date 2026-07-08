@@ -11,7 +11,6 @@ import Store from "electron-store";
 import { defaultSettings } from "./utils/defaultSettings.js";
 import { hideWindow, showWindow } from "./utils/utils.js";
 import {
-  getCaretPoint,
   isAccessibilityTrusted,
   pasteInFrontmostApp,
 } from "./utils/macAutomation.js";
@@ -46,6 +45,8 @@ let hideWindowTimeout;
 let settings;
 let autoHideWindowSetting;
 let accessibilityPromptShown = false;
+let lastSetPosition = null;
+let saveWindowPositionTimeout;
 
 const backgroundColor = () =>
   nativeTheme.shouldUseDarkColors
@@ -98,6 +99,7 @@ const createWindow = () => {
 
   mainWindow.on("move", () => {
     autoHideWindow();
+    saveWindowPositionSoon();
   });
 
   mainWindow.on("resize", () => {
@@ -298,30 +300,59 @@ function registerShortcut() {
   }
 }
 
-async function openClipboard() {
+function openClipboard() {
   if (mainWindow?.isFocused() && mainWindow?.isVisible()) {
     mainWindow?.webContents.send("next-clip");
   } else {
-    await positionWindowNearCaret();
+    positionWindow();
     showWindow(mainWindow);
     autoHideWindow();
   }
 }
 
-async function positionWindowNearCaret() {
+// Debounced from the window's "move" events: once the window settles, remember
+// where the user dragged it — per display, so each screen keeps its own spot.
+// Moves caused by our own setPosition land exactly on lastSetPosition and are
+// skipped.
+function saveWindowPositionSoon() {
+  clearTimeout(saveWindowPositionTimeout);
+  saveWindowPositionTimeout = setTimeout(() => {
+    if (!mainWindow) return;
+    const [x, y] = mainWindow.getPosition();
+    if (lastSetPosition && lastSetPosition.x === x && lastSetPosition.y === y)
+      return;
+    const [width, height] = mainWindow.getSize();
+    const display = screen.getDisplayMatching({ x, y, width, height });
+    const positions = settings.get("windowPositions") ?? {};
+    positions[display.id] = { x, y };
+    settings.set("windowPositions", positions);
+  }, 300);
+}
+
+function positionWindow() {
   if (!mainWindow || windowPinned) return; // don't yank a pinned window around
-  const caret = await getCaretPoint(350);
-  const point = caret ?? screen.getCursorScreenPoint();
-  const { workArea } = screen.getDisplayNearestPoint(point);
   const [w, h] = mainWindow.getSize();
-  const margin = 8;
-  let x = point.x + margin;
-  let y = point.y + margin;
-  // Flip above the caret if there's no room below, so the popup never
-  // covers the insertion line.
-  if (y + h > workArea.y + workArea.height) y = point.y - h - margin - 24;
-  x = Math.round(Math.min(Math.max(x, workArea.x), workArea.x + workArea.width - w));
-  y = Math.round(Math.min(Math.max(y, workArea.y), workArea.y + workArea.height - h));
+  const display = screen.getDisplayNearestPoint(screen.getCursorScreenPoint());
+  const { workArea: a } = display;
+  const saved = (settings.get("windowPositions") ?? {})[display.id];
+  // Reuse this display's remembered spot only while it still overlaps the
+  // display (its resolution/arrangement may have changed since).
+  const savedVisible =
+    saved &&
+    saved.x < a.x + a.width &&
+    saved.x + w > a.x &&
+    saved.y < a.y + a.height &&
+    saved.y + h > a.y;
+  let x, y;
+  if (savedVisible) {
+    ({ x, y } = saved);
+  } else {
+    // Default: horizontally centered, upper third of the screen the cursor
+    // is on — one predictable spot, Spotlight-style.
+    x = Math.round(a.x + (a.width - w) / 2);
+    y = Math.round(a.y + (a.height - h) * 0.25);
+  }
+  lastSetPosition = { x, y };
   mainWindow.setPosition(x, y);
 }
 
