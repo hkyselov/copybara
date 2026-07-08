@@ -9,7 +9,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
   pinWindow: (pin) => ipcRenderer.send("pin-window", pin),
   hideWindow: () => ipcRenderer.send("hide-window"),
   clipInfo: (uuid) => ipcRenderer.send("clip-info", uuid),
-  preventAutoHide: (uuid) => ipcRenderer.send("prevent-auto-hide", uuid),
+  preventAutoHide: () => ipcRenderer.send("prevent-auto-hide"),
   onUpdateWindowPin: (callback) =>
     ipcRenderer.on("update-window-pin", (_event, pin) => callback(pin)),
   onUpdateClipInfo: (callback) =>

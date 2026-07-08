@@ -185,8 +185,8 @@ if (!gotTheLock) {
       getClipInfo(uuid);
     });
 
-    ipcMain.on("prevent-auto-hide", (event, uuid) => {
-      autoHideWindow(uuid);
+    ipcMain.on("prevent-auto-hide", () => {
+      autoHideWindow();
     });
 
     ipcMain.on("settings:save-settings", (event, key, value) => {
@@ -333,7 +333,7 @@ function promptAccessibilityOncePerRun() {
   isAccessibilityTrusted(true);
 }
 
-function autoHideWindow(uuid) {
+function autoHideWindow() {
   if (hideWindowTimeout) {
     clearInterval(hideWindowTimeout);
     hideWindowTimeout = null;
@@ -342,11 +342,10 @@ function autoHideWindow(uuid) {
   hideWindowTimeout = setTimeout(() => {
     if (!windowPinned) {
       if (autoHideWindowSetting) {
+        // Auto-hide never selects: merely navigating to a clip with the
+        // shortcut and letting the window disappear must not rewrite the OS
+        // clipboard. Only an explicit Enter/click selects (and pastes).
         hideWindow(mainWindow);
-        // No pasteInFrontmostApp here: this timer can fire long after the
-        // user switched to another app, so a synthetic Cmd+V could land in
-        // the wrong place. Only an explicit Enter/click pastes.
-        if (uuid) selectClip(uuid, true);
       }
     }
     autoHideWindow();

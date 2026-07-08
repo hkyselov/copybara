@@ -125,8 +125,7 @@ function next() {
   if (!next || next.tagName.toLowerCase() !== "clip-item") {
     next = document.querySelector("clip-item:first-of-type");
   }
-  preventAutoHide(next.uuid);
-  console.log("next: ", next.uuid);
+  preventAutoHide();
   setTimeout(() => {
     next?.focus();
   }, 0);
@@ -139,14 +138,14 @@ function prev() {
   if (!prev || prev.tagName.toLowerCase() !== "clip-item") {
     prev = document.querySelector("clip-item:last-of-type");
   }
-  preventAutoHide(prev.uuid);
+  preventAutoHide();
   setTimeout(() => {
     prev?.focus();
   }, 0);
 }
 
-function preventAutoHide(uuid) {
-  window.electronAPI.preventAutoHide(uuid);
+function preventAutoHide() {
+  window.electronAPI.preventAutoHide();
 }
 
 setupListeners();
