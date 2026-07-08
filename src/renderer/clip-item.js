@@ -121,9 +121,14 @@ class ClipItem extends HTMLElement {
 
   selectClip(event) {
     this.focus();
-    if (this == this.parentNode.firstElementChild) return;
     event.stopPropagation();
     event.preventDefault();
+    if (this == this.parentNode.firstElementChild) {
+      // Topmost clip keeps its position, so skip the remove-animation but
+      // still notify main so the window hides and the clip gets pasted.
+      window.electronAPI.selectClip(this.uuid);
+      return;
+    }
     this.classList.remove("show");
     this.ontransitionend = (event) => {
       if (event.propertyName === "scale") {

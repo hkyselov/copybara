@@ -118,13 +118,18 @@ export function pinClip(uuid, pin) {
 
 export function selectClip(uuid, forceUpdate) {
   const index = getIndexOfElementByUuid(uuid);
-  if (index !== -1) {
-    const clip = clipboardHistory.splice(index, 1)[0];
-    writeClipToClipboard(clip);
-    addClipboardHistory(clip);
-    if (forceUpdate) {
-      callbacks.onHistoryChange(getClipboardHistory());
-    }
+  if (index === -1) return;
+  if (index === clipboardHistory.length - 1) {
+    // Topmost clip: order unchanged; just refresh the OS clipboard.
+    // Skipping addClipboardHistory avoids a duplicate onNewClip render.
+    writeClipToClipboard(clipboardHistory[index]);
+    return;
+  }
+  const clip = clipboardHistory.splice(index, 1)[0];
+  writeClipToClipboard(clip);
+  addClipboardHistory(clip);
+  if (forceUpdate) {
+    callbacks.onHistoryChange(getClipboardHistory());
   }
 }
 
