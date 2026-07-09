@@ -48,6 +48,15 @@ window.electronAPI.onLoadSettings((settings) => {
     );
   };
 
+  const clipDisplayLinesSelect = document.getElementById("clip-display-lines");
+  clipDisplayLinesSelect.value = settings.clipDisplayLines;
+  clipDisplayLinesSelect.onchange = (event) => {
+    window.electronAPI.saveSettings(
+      "clipDisplayLines",
+      clipDisplayLinesSelect.value
+    );
+  };
+
   const shortcuInput = document.getElementById("shortcut");
   shortcuInput.value = settings.openClipboardShortcut.display;
 

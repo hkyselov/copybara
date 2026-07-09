@@ -33,7 +33,9 @@ function clipboardListener() {
       currentClip.raw !== html
     ) {
       addClipboardHistory({
-        value: fromClip.trim() === "" ? "  " : fromClip.substring(0, 256),
+        // display value only — trimmed so pre-wrap rendering doesn't show
+        // leading/trailing blank lines; raw/rawStr keep the exact clipboard
+        value: fromClip.trim() === "" ? "  " : fromClip.trim().substring(0, 256),
         raw: html,
         rawStr: fromClip,
         type: ClipTypes.html,
@@ -46,7 +48,7 @@ function clipboardListener() {
       currentClip.raw !== fromClip
     ) {
       addClipboardHistory({
-        value: fromClip.trim() === "" ? "  " : fromClip.substring(0, 256),
+        value: fromClip.trim() === "" ? "  " : fromClip.trim().substring(0, 256),
         raw: fromClip,
         type: ClipTypes.text,
       });

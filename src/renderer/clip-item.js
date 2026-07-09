@@ -66,7 +66,7 @@ class ClipItem extends HTMLElement {
     const clipBtn = this.shadowRoot.querySelector("li a");
     if (this.type === "text" || this.type === "html") {
       const span = document.createElement("span");
-      span.innerText = this.textContent;
+      span.textContent = this.textContent;
       clipBtn.prepend(span);
     } else if (this.type === "image") {
       const img = document.createElement("img");

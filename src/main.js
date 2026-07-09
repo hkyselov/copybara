@@ -89,6 +89,10 @@ const createWindow = () => {
   mainWindow.webContents.on("did-finish-load", () => {
     mainWindow.webContents.send("update-clipboard", getClipboardHistory());
     mainWindow.webContents.send("update-window-pin", windowPinned);
+    mainWindow.webContents.send(
+      "update-clip-display-lines",
+      settings.get("clipDisplayLines")
+    );
   });
 
   // Open the DevTools.
@@ -206,6 +210,14 @@ if (!gotTheLock) {
         autoHideWindow();
       }
 
+      if (key === "clipDisplayLines") {
+        settings.set("clipDisplayLines", Number(value));
+        mainWindow?.webContents.send(
+          "update-clip-display-lines",
+          Number(value)
+        );
+      }
+
       if (key === "pasteOnSelect") {
         settings.set("pasteOnSelect", value);
         if (value) isAccessibilityTrusted(true);
@@ -228,6 +240,10 @@ if (!gotTheLock) {
         app.setLoginItemSettings({ openAtLogin: settings.get("openAtLogin") });
         autoHideWindowSetting = settings.get("autoHideWindow");
         autoHideWindow();
+        mainWindow?.webContents.send(
+          "update-clip-display-lines",
+          settings.get("clipDisplayLines")
+        );
         loadSettings();
       }
     });
