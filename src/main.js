@@ -157,18 +157,19 @@ if (!gotTheLock) {
 
     ipcMain.on("select-clip", (event, uuid) => {
       selectClip(uuid);
-      if (windowPinned) return;
-      hideWindow(mainWindow);
+      if (!windowPinned) hideWindow(mainWindow);
       if (settings.get("pasteOnSelect")) {
         if (!isAccessibilityTrusted(false)) {
           promptAccessibilityOncePerRun();
-          app.hide();
+          yieldFocus();
           return;
         }
-        app.hide();
+        yieldFocus();
         setTimeout(() => {
           pasteInFrontmostApp();
         }, 120);
+      } else if (windowPinned) {
+        yieldFocus();
       }
     });
 
@@ -354,6 +355,17 @@ function positionWindow() {
   }
   lastSetPosition = { x, y };
   mainWindow.setPosition(x, y);
+}
+
+// Hand focus back to whatever app was active before the popup. app.hide()
+// pops macOS's own activation stack, so we don't have to track the previous
+// app ourselves; when pinned, immediately re-show the window without
+// re-taking focus so it stays on screen.
+function yieldFocus() {
+  app.hide();
+  if (windowPinned && mainWindow) {
+    mainWindow.showInactive();
+  }
 }
 
 // The Accessibility prompt is shown at most once per run; pasteOnSelect
