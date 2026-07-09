@@ -24,9 +24,9 @@ export function createSettingWindow(backgroundColor) {
   settingWindow = new BrowserWindow({
     titleBarStyle: "hidden",
     minWidth: 400,
-    minHeight: 335,
+    minHeight: 400,
     width: 400,
-    height: 335,
+    height: 400,
     alwaysOnTop: true,
     opacity: 0,
     show: false,
