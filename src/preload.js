@@ -15,6 +15,10 @@ contextBridge.exposeInMainWorld("electronAPI", {
   onUpdateClipInfo: (callback) =>
     ipcRenderer.on("update-clip-info", (_event, clip) => callback(clip)),
   onNextClip: (callback) => ipcRenderer.on("next-clip", (_event) => callback()),
+  onUpdateClipDisplayLines: (callback) =>
+    ipcRenderer.on("update-clip-display-lines", (_event, lines) =>
+      callback(lines)
+    ),
   onLoadSettings: (callback) =>
     ipcRenderer.on("settings:load-settings", (_event, settings) =>
       callback(settings)

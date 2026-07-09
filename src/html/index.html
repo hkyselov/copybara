@@ -105,9 +105,12 @@
 
         span {
           width: 100%;
-          white-space: nowrap;
           overflow: hidden;
-          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: var(--clip-lines, 1);
+          white-space: pre-wrap;
+          word-break: break-word;
         }
 
         img {

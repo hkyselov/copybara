@@ -54,6 +54,10 @@ window.electronAPI.onNextClip(() => {
   next();
 });
 
+window.electronAPI.onUpdateClipDisplayLines((lines) => {
+  document.documentElement.style.setProperty("--clip-lines", lines);
+});
+
 function createItem(item, ul) {
   const clipItem = document.createElement("clip-item");
   clipItem.uuid = item.uuid;
@@ -62,7 +66,9 @@ function createItem(item, ul) {
   clipItem.pinned = item.pinned;
   clipItem.setAttribute("tabIndex", 0);
 
-  clipItem.innerText = item.value;
+  // textContent keeps newlines as real \n (innerText would turn them into
+  // <br> elements, which get lost when clip-item reads textContent back)
+  clipItem.textContent = item.value;
   ul.prepend(clipItem);
   setTimeout(function () {
     clipItem.classList.add("show");
