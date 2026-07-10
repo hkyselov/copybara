@@ -58,6 +58,10 @@ window.electronAPI.onUpdateClipDisplayLines((lines) => {
   document.documentElement.style.setProperty("--clip-lines", lines);
 });
 
+window.electronAPI.onUpdateClipFontSize((size) => {
+  document.documentElement.style.setProperty("--clip-font-size", size + "px");
+});
+
 function createItem(item, ul) {
   const clipItem = document.createElement("clip-item");
   clipItem.uuid = item.uuid;
