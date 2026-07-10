@@ -114,7 +114,9 @@
           line-height: 1.5;
           min-height: calc(var(--clip-lines, 1) * 1.5em);
           white-space: pre-wrap;
-          word-break: break-word;
+          /* break-all fills each clamped line to the edge instead of
+             wrapping whole tokens (long code/URLs) to hidden lines */
+          word-break: break-all;
         }
 
         img {
