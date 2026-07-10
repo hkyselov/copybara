@@ -109,6 +109,9 @@
           display: -webkit-box;
           -webkit-box-orient: vertical;
           -webkit-line-clamp: var(--clip-lines, 1);
+          /* every text clip gets the full N-line height so the list stays uniform */
+          line-height: 1.5;
+          min-height: calc(var(--clip-lines, 1) * 1.5em);
           white-space: pre-wrap;
           word-break: break-word;
         }
