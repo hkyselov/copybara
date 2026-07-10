@@ -57,6 +57,12 @@ window.electronAPI.onLoadSettings((settings) => {
     );
   };
 
+  const clipFontSizeSelect = document.getElementById("clip-font-size");
+  clipFontSizeSelect.value = settings.clipFontSize;
+  clipFontSizeSelect.onchange = (event) => {
+    window.electronAPI.saveSettings("clipFontSize", clipFontSizeSelect.value);
+  };
+
   const shortcuInput = document.getElementById("shortcut");
   shortcuInput.value = settings.openClipboardShortcut.display;
 

@@ -93,6 +93,10 @@ const createWindow = () => {
       "update-clip-display-lines",
       settings.get("clipDisplayLines")
     );
+    mainWindow.webContents.send(
+      "update-clip-font-size",
+      settings.get("clipFontSize")
+    );
   });
 
   // Open the DevTools.
@@ -218,6 +222,11 @@ if (!gotTheLock) {
         );
       }
 
+      if (key === "clipFontSize") {
+        settings.set("clipFontSize", Number(value));
+        mainWindow?.webContents.send("update-clip-font-size", Number(value));
+      }
+
       if (key === "pasteOnSelect") {
         settings.set("pasteOnSelect", value);
         if (value) isAccessibilityTrusted(true);
@@ -243,6 +252,10 @@ if (!gotTheLock) {
         mainWindow?.webContents.send(
           "update-clip-display-lines",
           settings.get("clipDisplayLines")
+        );
+        mainWindow?.webContents.send(
+          "update-clip-font-size",
+          settings.get("clipFontSize")
         );
         loadSettings();
       }

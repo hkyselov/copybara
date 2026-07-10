@@ -19,6 +19,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
     ipcRenderer.on("update-clip-display-lines", (_event, lines) =>
       callback(lines)
     ),
+  onUpdateClipFontSize: (callback) =>
+    ipcRenderer.on("update-clip-font-size", (_event, size) => callback(size)),
   onLoadSettings: (callback) =>
     ipcRenderer.on("settings:load-settings", (_event, settings) =>
       callback(settings)
