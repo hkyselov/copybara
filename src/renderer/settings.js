@@ -57,6 +57,12 @@ window.electronAPI.onLoadSettings((settings) => {
     );
   };
 
+  const appearanceSelect = document.getElementById("appearance");
+  appearanceSelect.value = settings.appearance;
+  appearanceSelect.onchange = (event) => {
+    window.electronAPI.saveSettings("appearance", appearanceSelect.value);
+  };
+
   const clipFontSizeSelect = document.getElementById("clip-font-size");
   clipFontSizeSelect.value = settings.clipFontSize;
   clipFontSizeSelect.onchange = (event) => {

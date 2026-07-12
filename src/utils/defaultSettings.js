@@ -1,5 +1,6 @@
 export const defaultSettings = {
   openAtLogin: true,
+  appearance: "system",
   autoHideWindow: true,
   autoHideDelayTime: 3,
   clipDisplayLines: 1,

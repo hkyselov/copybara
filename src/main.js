@@ -142,6 +142,7 @@ if (!gotTheLock) {
     }
     app.setLoginItemSettings({ openAtLogin: settings.get("openAtLogin") });
     autoHideWindowSetting = settings.get("autoHideWindow");
+    nativeTheme.themeSource = settings.get("appearance");
 
     createTray(
       () => {
@@ -205,6 +206,10 @@ if (!gotTheLock) {
         settings.set("openAtLogin", value);
         app.setLoginItemSettings({ openAtLogin: value });
       }
+      if (key === "appearance") {
+        settings.set("appearance", value);
+        nativeTheme.themeSource = value;
+      }
       if (key === "autoHideWindow") {
         settings.set("autoHideWindow", value);
         autoHideWindowSetting = value;
@@ -248,6 +253,7 @@ if (!gotTheLock) {
         registerShortcut();
         app.setLoginItemSettings({ openAtLogin: settings.get("openAtLogin") });
         autoHideWindowSetting = settings.get("autoHideWindow");
+        nativeTheme.themeSource = settings.get("appearance");
         autoHideWindow();
         mainWindow?.webContents.send(
           "update-clip-display-lines",
