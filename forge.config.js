@@ -58,7 +58,7 @@ const masSigning = {
 export const packagerConfig = {
   buildIdentifier: isRelease ? "release" : "dev",
   asar: true,
-  icon: "./src/images/iconTestNew",
+  icon: "./src/images/icon",
   appBundleId: "com.copybara",
   appVersion: "1.0.1",
   buildVersion: "1.0.1",
@@ -86,14 +86,14 @@ export const makers = [
     name: "@electron-forge/maker-pkg",
     platforms: ["mas"],
     config: {
-      icon: "./src/images/iconTestNew.icns",
+      icon: "./src/images/icon.icns",
     },
   },
   {
     name: "@electron-forge/maker-dmg",
     config: {
       background: "./src/images/background.png",
-      icon: "./src/images/iconTestNew.icns",
+      icon: "./src/images/icon.icns",
       format: "ULFO",
       additionalDMGOptions: {
         window: {
