@@ -60,8 +60,8 @@ export const packagerConfig = {
   asar: true,
   icon: "./src/images/icon",
   appBundleId: "com.copybara",
-  appVersion: "1.0.1",
-  buildVersion: "1.0.1",
+  // appVersion/buildVersion intentionally omitted: electron-packager defaults
+  // them to package.json's version, the single place to bump per release.
   ...(isMas ? masSigning : darwinSigning),
 };
 export const rebuildConfig = {};
