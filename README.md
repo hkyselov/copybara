@@ -32,6 +32,16 @@
 
 ## Install
 
+### Homebrew
+
+```bash
+brew install --cask hkyselov/tap/copybara --no-quarantine
+```
+
+`--no-quarantine` skips the Gatekeeper warning described below.
+
+### Manual
+
 Grab the latest `.dmg` from the [Releases](https://github.com/hkyselov/copybara/releases) page, open it, and drag **Copybara** into **Applications**.
 
 ### First launch
