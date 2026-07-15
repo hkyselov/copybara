@@ -9,20 +9,12 @@
     "start": "electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
-    "mac": "BUILD_PLATFORM=darwin npm run make -- --arch=universal --platform=darwin",
-    "mas": "npm run make -- --arch=universal --platform=mas",
-    "mas-release": "BUILD_TYPE=release npm run mas",
-    "publish": "electron-forge publish",
+    "mac": "npm run make -- --arch=universal --platform=darwin",
     "lint": "echo \"No linting configured\""
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.11.2",
-    "@electron-forge/maker-deb": "^7.11.2",
     "@electron-forge/maker-dmg": "^7.11.2",
-    "@electron-forge/maker-pkg": "^7.11.2",
-    "@electron-forge/maker-rpm": "^7.11.2",
-    "@electron-forge/maker-squirrel": "^7.11.2",
-    "@electron-forge/maker-zip": "^7.11.2",
     "@electron-forge/plugin-auto-unpack-natives": "^7.11.2",
     "@electron-forge/plugin-fuses": "^7.11.2",
     "@electron/fuses": "^1.8.0",
@@ -39,12 +31,10 @@
     "extract-zip": "npm:@electron-internal/extract-zip@^1.0.4"
   },
   "dependencies": {
-    "electron-squirrel-startup": "^1.0.1",
     "electron-store": "^11.0.2"
   },
   "allowScripts": {
     "electron@43.0.0": true,
-    "electron-winstaller@5.4.4": true,
     "fs-xattr@0.3.1": true,
     "macos-alias@0.2.12": true
   }
