@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copybara — the calmest clipboard on your Mac</title>
+<meta name="description" content="Copybara is a free, open-source clipboard manager for macOS. It remembers everything you copy and hands it back with one shortcut — no dock icon, no fuss.">
+<link rel="icon" type="image/png" href="icon.png">
+<meta property="og:title" content="Copybara">
+<meta property="og:description" content="A free, open-source clipboard manager that lives in your Mac's menu bar.">
+<meta property="og:image" content="https://hkyselov.github.io/copybara/screenshot.png">
+<meta property="og:url" content="https://hkyselov.github.io/copybara/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1b1712;
+    --surface: #262220;
+    --surface-2: #2e2a27;
+    --line: #3a3530;
+    --text: #ede6da;
+    --muted: #a79b87;
+    --tan: #c9ae8b;
+    --blue: #2f6bef;
+    --font-body: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-display: "Bricolage Grotesque", var(--font-body);
+    --font-mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  ::selection { background: var(--blue); color: #fff; }
+
+  a { color: var(--tan); text-underline-offset: 3px; }
+  a:hover { color: var(--text); }
+
+  :focus-visible {
+    outline: 2px solid var(--blue);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  .wrap { max-width: 1020px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------- header ---------- */
+  .site-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 28px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text);
+  }
+  .brand img { width: 40px; height: 40px; }
+  .brand span {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .gh-link {
+    font-size: 15px;
+    color: var(--muted);
+    text-decoration: none;
+    border: 1px solid var(--line);
+    padding: 8px 14px;
+    border-radius: 8px;
+  }
+  .gh-link:hover { color: var(--text); border-color: var(--tan); }
+
+  /* ---------- hero ---------- */
+  .hero {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    gap: 56px;
+    align-items: center;
+    padding: 88px 0 72px;
+  }
+  .hero h1 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(2.5rem, 5.5vw, 3.9rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+  .hero h1 em {
+    font-style: normal;
+    color: var(--tan);
+  }
+  .hero .lede {
+    margin-top: 20px;
+    font-size: 19px;
+    color: var(--muted);
+    max-width: 32em;
+  }
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 32px;
+    align-items: center;
+  }
+  .btn {
+    display: inline-block;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 16px;
+    padding: 13px 22px;
+    border-radius: 10px;
+  }
+  .btn-primary {
+    background: var(--blue);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #4079f2; color: #fff; }
+  .btn-ghost {
+    color: var(--text);
+    border: 1px solid var(--line);
+  }
+  .btn-ghost:hover { border-color: var(--tan); color: var(--text); }
+  .shortcut-hint {
+    margin-top: 22px;
+    font-size: 15px;
+    color: var(--muted);
+  }
+  kbd {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-bottom-width: 2px;
+    border-radius: 6px;
+    padding: 3px 8px;
+    color: var(--text);
+    margin: 0 1px;
+  }
+
+  /* ---------- live popup demo ---------- */
+  .demo { justify-self: center; width: 100%; max-width: 360px; }
+  .demo-caption {
+    text-align: center;
+    font-size: 14px;
+    color: var(--tan);
+    margin-bottom: 14px;
+  }
+  .popup {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    padding: 10px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+  }
+  .popup-top {
+    display: flex;
+    justify-content: flex-end;
+    padding: 2px 4px 8px;
+  }
+  .pin {
+    width: 26px; height: 26px;
+    border-radius: 7px;
+    border: 1px solid var(--line);
+    background: var(--surface-2);
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1;
+    display: grid;
+    place-items: center;
+  }
+  .popup-inner {
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 8px;
+    min-height: 264px;
+    display: flex;
+    flex-direction: column;
+  }
+  .traffic {
+    display: flex;
+    gap: 7px;
+    padding: 4px 6px 10px;
+  }
+  .traffic i {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+  }
+  .traffic i:nth-child(1) { background: #ff5f57; }
+  .traffic i:nth-child(2) { background: #febc2e; }
+  .traffic i:nth-child(3) { background: #28c840; }
+  .clip-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+  }
+  .clip {
+    font-size: 15px;
+    padding: 12px 14px;
+    border-radius: 9px;
+    cursor: pointer;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    text-align: left;
+    width: 100%;
+    font-family: var(--font-body);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background 0.15s ease;
+  }
+  .clip:hover { background: rgba(47, 107, 239, 0.35); }
+  .clip.flash { animation: land 1.2s ease-out; }
+  @keyframes land {
+    0% { background: var(--blue); }
+    100% { background: transparent; }
+  }
+  .clip-empty {
+    flex: 1;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    font-size: 14px;
+    text-align: center;
+    padding: 24px 16px;
+  }
+  .popup-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 6px 2px;
+  }
+  .popup-bottom .label {
+    color: var(--muted);
+    font-size: 14px;
+  }
+  .clear-all {
+    font-size: 13px;
+    color: var(--muted);
+    background: none;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 5px 12px;
+    cursor: pointer;
+    font-family: var(--font-body);
+  }
+  .clear-all:hover { color: var(--text); border-color: var(--tan); }
+  .copied-note {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 12px;
+    min-height: 1.4em;
+  }
+
+  /* ---------- showcase ---------- */
+  .showcase { padding: 40px 0 72px; text-align: center; }
+  .showcase img {
+    max-width: 100%;
+    width: 680px;
+    border-radius: 16px;
+    border: 1px solid var(--line);
+  }
+  .showcase figcaption {
+    margin-top: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  /* ---------- features ---------- */
+  .features { padding: 32px 0 72px; }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--tan);
+  }
+  .features h2, .install h2 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: clamp(1.7rem, 3vw, 2.3rem);
+    letter-spacing: -0.02em;
+    margin: 10px 0 28px;
+  }
+  .feature-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .feature {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 18px;
+    align-items: baseline;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 22px;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .feature:hover {
+    background: rgba(47, 107, 239, 0.16);
+    border-color: rgba(47, 107, 239, 0.5);
+  }
+  .feature h3 {
+    font-size: 16px;
+    font-weight: 650;
+  }
+  .feature p { color: var(--muted); font-size: 15.5px; }
+
+  /* ---------- install ---------- */
+  .install { padding: 32px 0 80px; }
+  .install-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+  }
+  .steps {
+    list-style: none;
+    counter-reset: step;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .steps li {
+    counter-increment: step;
+    padding-left: 44px;
+    position: relative;
+    color: var(--muted);
+  }
+  .steps li strong { color: var(--text); font-weight: 600; }
+  .steps li::before {
+    content: counter(step);
+    position: absolute;
+    left: 0; top: 2px;
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    color: var(--tan);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    display: grid;
+    place-items: center;
+  }
+  .gatekeeper {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 22px 24px;
+  }
+  .gatekeeper h3 { font-size: 16px; margin-bottom: 10px; }
+  .gatekeeper p { color: var(--muted); font-size: 15px; margin-bottom: 12px; }
+  .codeblock {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background: var(--bg);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 12px 14px;
+    font-family: var(--font-mono);
+    font-size: 13.5px;
+    color: var(--tan);
+    overflow-x: auto;
+  }
+  .copy-btn {
+    flex-shrink: 0;
+    font-family: var(--font-body);
+    font-size: 13px;
+    color: var(--muted);
+    background: var(--surface-2);
+    border: 1px solid var(--line);
+    border-radius: 7px;
+    padding: 5px 12px;
+    cursor: pointer;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--tan); }
+
+  /* ---------- footer ---------- */
+  .site-footer {
+    border-top: 1px solid var(--line);
+    padding: 32px 0 48px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 14.5px;
+  }
+  .site-footer nav { display: flex; gap: 20px; }
+  .site-footer a { color: var(--muted); }
+  .site-footer a:hover { color: var(--text); }
+
+  /* ---------- responsive & motion ---------- */
+  @media (max-width: 860px) {
+    .hero { grid-template-columns: 1fr; gap: 48px; padding: 56px 0 56px; }
+    .demo { justify-self: start; }
+    .feature { grid-template-columns: 1fr; gap: 6px; }
+    .install-grid { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .clip.flash { animation: none; background: rgba(47, 107, 239, 0.35); }
+    .clip, .feature { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="site-header">
+    <a class="brand" href="#">
+      <img src="icon.png" alt="" width="40" height="40">
+      <span>Copybara</span>
+    </a>
+    <a class="gh-link" href="https://github.com/hkyselov/copybara">GitHub&nbsp;↗</a>
+  </header>
+
+  <section class="hero">
+    <div>
+      <h1>The <em>calmest</em> clipboard on your Mac.</h1>
+      <p class="lede">Copybara remembers everything you copy — text, rich text, images — and hands it back with one shortcut. Free, open source, and out of your way.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="https://github.com/hkyselov/copybara/releases/latest">Download for macOS</a>
+        <a class="btn btn-ghost" href="#install">How to install</a>
+      </div>
+      <p class="shortcut-hint">Summon it anywhere with <kbd>⌥</kbd><kbd>⌘</kbd><kbd>X</kbd></p>
+    </div>
+
+    <div class="demo">
+      <p class="demo-caption">This one works — copy any text on this page.</p>
+      <div class="popup" aria-label="Live demo of the Copybara popup">
+        <div class="popup-top">
+          <span class="pin" aria-hidden="true">📌</span>
+        </div>
+        <div class="popup-inner">
+          <div class="traffic" aria-hidden="true"><i></i><i></i><i></i></div>
+          <ul class="clip-list" id="clip-list">
+            <li class="clip-empty" id="clip-empty">Select some text on this page and hit <span style="white-space:nowrap;"><kbd>⌘</kbd><kbd>C</kbd></span> — it lands here.</li>
+          </ul>
+          <div class="popup-bottom">
+            <span class="label">Copybara Clipboard</span>
+            <button class="clear-all" id="clear-all" type="button">Clear All</button>
+          </div>
+        </div>
+      </div>
+      <p class="copied-note" id="copied-note" aria-live="polite"></p>
+    </div>
+  </section>
+
+  <figure class="showcase">
+    <img src="showcase.gif" alt="Screen recording of Copybara capturing clips and pasting them back" loading="lazy">
+    <figcaption>The real thing: copy, summon, pick, pasted.</figcaption>
+  </figure>
+
+  <section class="features">
+    <p class="eyebrow">What it does</p>
+    <h2>Small app, long memory</h2>
+    <ul class="feature-list">
+      <li class="feature">
+        <h3>History that keeps up</h3>
+        <p>Plain text, rich text, and images are captured the moment you copy them.</p>
+      </li>
+      <li class="feature">
+        <h3>Paste on select</h3>
+        <p>Pick a clip and it lands straight in the app you're working in — no extra ⌘V.</p>
+      </li>
+      <li class="feature">
+        <h3>Pin what matters</h3>
+        <p>Keep the clips you reuse at hand; remove the rest, or Clear All for a fresh start.</p>
+      </li>
+      <li class="feature">
+        <h3>Clip details on demand</h3>
+        <p>Inspect any history item — full contents, type, and size — in its own window.</p>
+      </li>
+      <li class="feature">
+        <h3>Out of your way</h3>
+        <p>No dock icon. The popup auto-hides when you're done and remembers its spot on every display.</p>
+      </li>
+      <li class="feature">
+        <h3>Fits your setup</h3>
+        <p>Light, dark, or system appearance. Adjustable font size and preview lines, open at login, your own shortcut.</p>
+      </li>
+    </ul>
+  </section>
+
+  <section class="install" id="install">
+    <p class="eyebrow">Install</p>
+    <h2>On your Mac in a minute</h2>
+    <div class="install-grid">
+      <ol class="steps">
+        <li><strong>Download the .dmg</strong> from the <a href="https://github.com/hkyselov/copybara/releases/latest">latest release</a> — universal, for Intel and Apple&nbsp;Silicon.</li>
+        <li><strong>Drag Copybara into Applications</strong> and launch it from the menu bar.</li>
+        <li><strong>Grant Accessibility permission</strong> when macOS asks — that's what lets Copybara paste a clip into the active app.</li>
+      </ol>
+      <div class="gatekeeper">
+        <h3>First launch on an unsigned app</h3>
+        <p>Copybara is a free project without a paid Apple developer account, so macOS warns on first open. Click <strong>Done</strong>, then allow it under <strong>System Settings → Privacy &amp; Security → Open Anyway</strong>.</p>
+        <p>Prefer the terminal? Clear the quarantine flag instead:</p>
+        <div class="codeblock">
+          <code id="xattr-cmd">xattr -cr /Applications/Copybara.app</code>
+          <button class="copy-btn" id="copy-cmd" type="button">Copy</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <span>MIT-licensed open source · Built with Electron</span>
+    <nav>
+      <a href="https://github.com/hkyselov/copybara">Source</a>
+      <a href="https://github.com/hkyselov/copybara/releases">Releases</a>
+      <a href="https://github.com/hkyselov/copybara/issues">Issues</a>
+    </nav>
+  </footer>
+</div>
+
+<script>
+(function () {
+  var list = document.getElementById("clip-list");
+  var empty = document.getElementById("clip-empty");
+  var note = document.getElementById("copied-note");
+  var MAX_CLIPS = 6;
+
+  function addClip(text) {
+    var trimmed = text.replace(/\s+/g, " ").trim();
+    if (!trimmed) return;
+    if (empty && empty.parentNode) empty.parentNode.removeChild(empty);
+
+    var li = document.createElement("li");
+    var btn = document.createElement("button");
+    btn.className = "clip flash";
+    btn.type = "button";
+    btn.textContent = trimmed.length > 60 ? trimmed.slice(0, 60) + "…" : trimmed;
+    btn.title = "Click to copy back";
+    btn.addEventListener("click", function () {
+      copyText(trimmed, btn);
+    });
+    li.appendChild(btn);
+    list.insertBefore(li, list.firstChild);
+
+    while (list.children.length > MAX_CLIPS) {
+      list.removeChild(list.lastChild);
+    }
+  }
+
+  function copyText(text, clipBtn) {
+    if (!navigator.clipboard) return;
+    navigator.clipboard.writeText(text).then(function () {
+      note.textContent = "Copied back to your clipboard.";
+      if (clipBtn) {
+        clipBtn.classList.remove("flash");
+        void clipBtn.offsetWidth;
+        clipBtn.classList.add("flash");
+      }
+      setTimeout(function () { note.textContent = ""; }, 2500);
+    }).catch(function () {});
+  }
+
+  document.addEventListener("copy", function () {
+    var selection = window.getSelection ? String(window.getSelection()) : "";
+    if (selection) addClip(selection);
+  });
+
+  document.getElementById("clear-all").addEventListener("click", function () {
+    list.innerHTML = "";
+    var placeholder = document.createElement("li");
+    placeholder.className = "clip-empty";
+    placeholder.innerHTML = "Fresh start. Copy something else — it lands here.";
+    list.appendChild(placeholder);
+    empty = placeholder;
+  });
+
+  document.getElementById("copy-cmd").addEventListener("click", function () {
+    var cmd = document.getElementById("xattr-cmd").textContent;
+    copyText(cmd, null);
+    addClip(cmd);
+    var btn = this;
+    btn.textContent = "Copied";
+    setTimeout(function () { btn.textContent = "Copy"; }, 2000);
+  });
+})();
+</script>
+
+</body>
+</html>
