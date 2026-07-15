@@ -35,10 +35,10 @@
 ### Homebrew
 
 ```bash
-brew install --cask hkyselov/tap/copybara --no-quarantine
+brew install --cask hkyselov/tap/copybara
 ```
 
-`--no-quarantine` skips the Gatekeeper warning described below.
+The first-launch steps below still apply (Homebrew 6 removed the `--no-quarantine` flag that used to skip them).
 
 ### Manual
 
