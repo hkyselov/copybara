@@ -33,7 +33,12 @@ import {
   setSettingsWindowBackgroundColor,
 } from "./utils/createSettingWindow.js";
 
-import { createTray } from "./utils/tray.js";
+import { createTray, setTrayUpdateAvailable } from "./utils/tray.js";
+import {
+  initUpdateChecker,
+  startUpdateChecks,
+  stopUpdateChecks,
+} from "./utils/updateChecker.js";
 
 import { fileURLToPath } from "url";
 
@@ -156,6 +161,9 @@ if (!gotTheLock) {
 
     registerShortcut();
 
+    initUpdateChecker(settings, setTrayUpdateAvailable);
+    if (settings.get("checkForUpdates")) startUpdateChecks();
+
     ipcMain.on("remove-clip", (event, uuid) => {
       removeClip(uuid);
     });
@@ -237,6 +245,15 @@ if (!gotTheLock) {
         if (value) isAccessibilityTrusted(true);
       }
 
+      if (key === "checkForUpdates") {
+        settings.set("checkForUpdates", value);
+        if (value) {
+          startUpdateChecks();
+        } else {
+          stopUpdateChecks();
+        }
+      }
+
       if (key === "openClipboardShortcut") {
         if (value) {
           settings.set("openClipboardShortcut", value);
@@ -251,6 +268,7 @@ if (!gotTheLock) {
         unRegisterShortcut();
         settings.store = defaultSettings;
         registerShortcut();
+        if (settings.get("checkForUpdates")) startUpdateChecks();
         app.setLoginItemSettings({ openAtLogin: settings.get("openAtLogin") });
         autoHideWindowSetting = settings.get("autoHideWindow");
         nativeTheme.themeSource = settings.get("appearance");
