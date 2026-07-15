@@ -370,6 +370,7 @@
   }
   .gatekeeper h3 { font-size: 16px; margin-bottom: 10px; }
   .gatekeeper p { color: var(--muted); font-size: 15px; margin-bottom: 12px; }
+  .brew-card { margin-bottom: 36px; }
   .codeblock {
     display: flex;
     align-items: center;
@@ -509,6 +510,14 @@
   <section class="install" id="install">
     <p class="eyebrow">Install</p>
     <h2>On your Mac in a minute</h2>
+    <div class="gatekeeper brew-card">
+      <h3>Fastest: Homebrew</h3>
+      <p>One command, and <code>--no-quarantine</code> skips the unsigned-app warning entirely.</p>
+      <div class="codeblock">
+        <code id="brew-cmd">brew install --cask hkyselov/tap/copybara --no-quarantine</code>
+        <button class="copy-btn" data-copy="brew-cmd" type="button">Copy</button>
+      </div>
+    </div>
     <div class="install-grid">
       <ol class="steps">
         <li><strong>Download the .dmg</strong> from the <a href="https://github.com/hkyselov/copybara/releases/latest">latest release</a> — universal, for Intel and Apple&nbsp;Silicon.</li>
@@ -521,7 +530,7 @@
         <p>Prefer the terminal? Clear the quarantine flag instead:</p>
         <div class="codeblock">
           <code id="xattr-cmd">xattr -cr /Applications/Copybara.app</code>
-          <button class="copy-btn" id="copy-cmd" type="button">Copy</button>
+          <button class="copy-btn" data-copy="xattr-cmd" type="button">Copy</button>
         </div>
       </div>
     </div>
@@ -593,13 +602,14 @@
     empty = placeholder;
   });
 
-  document.getElementById("copy-cmd").addEventListener("click", function () {
-    var cmd = document.getElementById("xattr-cmd").textContent;
-    copyText(cmd, null);
-    addClip(cmd);
-    var btn = this;
-    btn.textContent = "Copied";
-    setTimeout(function () { btn.textContent = "Copy"; }, 2000);
+  Array.prototype.forEach.call(document.querySelectorAll(".copy-btn[data-copy]"), function (btn) {
+    btn.addEventListener("click", function () {
+      var cmd = document.getElementById(btn.getAttribute("data-copy")).textContent;
+      copyText(cmd, null);
+      addClip(cmd);
+      btn.textContent = "Copied";
+      setTimeout(function () { btn.textContent = "Copy"; }, 2000);
+    });
   });
 })();
 </script>
