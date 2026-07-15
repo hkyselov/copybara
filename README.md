@@ -7,6 +7,16 @@
 <p align="center">A lightweight clipboard manager for macOS that lives in your menu bar.</p>
 
 <p align="center">
+  <a href="https://github.com/hkyselov/copybara/actions/workflows/ci.yml"><img src="https://github.com/hkyselov/copybara/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+  <a href="https://github.com/hkyselov/copybara/releases/latest"><img src="https://img.shields.io/github/v/release/hkyselov/copybara" alt="Latest release"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/hkyselov/copybara" alt="License"></a>
+</p>
+
+<p align="center">
+  <a href="https://hkyselov.github.io/copybara/"><b>Website</b></a> · <a href="https://github.com/hkyselov/copybara/releases/latest"><b>Download</b></a>
+</p>
+
+<p align="center">
   <img src="docs/showcase.gif" width="640" alt="Copybara in action">
 </p>
 
@@ -21,6 +31,16 @@
 - **Fits your setup** — light/dark/system appearance, adjustable clip font size and preview lines, open at login
 
 ## Install
+
+### Homebrew
+
+```bash
+brew install --cask hkyselov/tap/copybara --no-quarantine
+```
+
+`--no-quarantine` skips the Gatekeeper warning described below.
+
+### Manual
 
 Grab the latest `.dmg` from the [Releases](https://github.com/hkyselov/copybara/releases) page, open it, and drag **Copybara** into **Applications**.
 
