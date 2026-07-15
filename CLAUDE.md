@@ -5,19 +5,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## What this is
 
 Copybara is a macOS-first Electron clipboard manager (menu-bar app, no dock icon). Package name
-`copybara`, product name `Copybara`, packaged for the Mac App Store (`platform: "mas"` in
-forge.config.js) as well as zip/deb/rpm/squirrel targets.
+`copybara`, product name `Copybara`, distributed as an ad-hoc-signed universal `.dmg` (the only
+maker configured in forge.config.js) via GitHub Releases.
 
 ## Commands
 
 ```bash
 npm install        # install deps (see "Electron install gotcha" below)
-npm start           # electron-forge start — runs the app in dev
-npm run package     # electron-forge package — build unpacked app
-npm run make        # electron-forge make — build platform installers/artifacts
-npm run mac         # make for darwin, universal arch
-npm run mas         # make for the Mac App Store target, universal arch
-npm run mas-release # BUILD_TYPE=release npm run mas — uses release signing identity/profile
+npm start          # electron-forge start — runs the app in dev
+npm run package    # electron-forge package — build unpacked app
+npm run make       # electron-forge make — build the .dmg
+npm run mac        # make for darwin, universal arch
 ```
 
 There is no test suite and no linter configured (`npm run lint` is a no-op placeholder).
@@ -96,11 +94,10 @@ OS clipboard.
 
 ### Packaging / signing (forge.config.js)
 
-Two signing identities selected via `BUILD_TYPE` env var (`ForgeUtils().fromBuildIdentity`):
-`dev` (Apple Development identity + `Profile_Dev.provisionprofile`, hardened runtime on) vs
-`release` (Apple Distribution identity + `Profile_Distribution.provisionprofile`, hardened runtime
-off). Entitlements file picked per-file (`entitlements.mas.inherit.plist` for anything inside
-`.app/`, otherwise `entitlements.mas.plist`) — neither the entitlements plists nor the
-`.provisionprofile` files are checked into this repo; they must be supplied locally to make/sign a
-`mas` build. Electron Fuses are configured to disable `RunAsNode`/Node CLI inspect/Node options env
-var and enforce ASAR integrity — packaged builds cannot be run with arbitrary Node flags.
+Builds are ad-hoc signed (`identity: "-"`, no Apple Developer account): required for the app to
+launch on Apple Silicon at all, with hardened runtime off because an ad-hoc (team-less) process
+fails library validation when loading the ad-hoc-signed Electron Framework. There is no
+notarization — downloaded builds trigger Gatekeeper's "Open Anyway" flow, and TCC permission
+grants (Accessibility) may reset between updates since ad-hoc signatures carry no stable identity.
+Electron Fuses are configured to disable `RunAsNode`/Node CLI inspect/Node options env var and
+enforce ASAR integrity — packaged builds cannot be run with arbitrary Node flags.
