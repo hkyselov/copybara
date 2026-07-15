@@ -35,8 +35,8 @@ function rebuildMenu() {
       click: menuActions.openSettingsWindow,
     },
     {
-      label: "Rate App",
-      click: () => console.log("Rate the App"),
+      label: "Star on GitHub",
+      click: () => shell.openExternal("https://github.com/hkyselov/copybara"),
     },
   ];
 

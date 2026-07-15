@@ -1,0 +1,29 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    name: Build (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # There is no test suite; a successful package+make of the .dmg for the
+      # runner's arch is the signal that the app still builds.
+      - name: Build .dmg
+        run: npm run make -- --platform=darwin
+
+      - name: Check artifact exists
+        run: ls out/make/*.dmg
