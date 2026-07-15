@@ -28,6 +28,17 @@ window.electronAPI.onLoadSettings((settings) => {
     );
   };
 
+  const checkForUpdatesCheckbox = document.querySelector(
+    'input[value="checkForUpdates"]'
+  );
+  checkForUpdatesCheckbox.checked = settings.checkForUpdates;
+  checkForUpdatesCheckbox.onchange = (event) => {
+    window.electronAPI.saveSettings(
+      checkForUpdatesCheckbox.value,
+      checkForUpdatesCheckbox.checked
+    );
+  };
+
   const pasteOnSelectCheckbox = document.querySelector(
     'input[value="pasteOnSelect"]'
   );
