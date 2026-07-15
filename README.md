@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src/images/icon.svg" width="128" alt="Copybara icon">
+  <img src="docs/icon.png" width="128" alt="Copybara app icon">
 </p>
 
 <h1 align="center">Copybara</h1>
