@@ -25,7 +25,7 @@ export function startClipboardListener() {
 function clipboardListener() {
   let currentClip = getCurrentClip();
   const fromClip = clipboard.readText();
-  const html = clipboard.readHTML();
+  const html = normalizeHtml(clipboard.readHTML());
   if (html && clipboard.availableFormats().includes("text/html")) {
     if (
       !currentClip ||
@@ -165,10 +165,14 @@ function writeClipToClipboard(clip) {
   if (clip.type === ClipTypes.html) {
     clipboard.write({
       text: clip.rawStr,
-      html: clip.raw.replace("<meta charset='utf-8'>", ""),
+      html: normalizeHtml(clip.raw),
     });
   }
 }
+
+// Chromium prepends this meta tag to any HTML it writes to the clipboard,
+// so strip it on read to keep raw stable across write-back round-trips.
+const normalizeHtml = (html) => html.replace(/^<meta charset=['"]utf-8['"]>/i, "");
 
 function getCurrentClip() {
   return clipboardHistory[clipboardHistory.length - 1];
